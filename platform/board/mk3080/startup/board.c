@@ -23,7 +23,7 @@
 
 #include "osdep_service.h"
 #include "rtl8710b_ota.h"
-
+#include "ssd1306.h"
 
 #define KEY_AWSS   12
 
@@ -241,6 +241,7 @@ void board_dma_init(void)
 
 void board_gpio_init()
 {
+	ssd1306_init();
     return;
 }
 
@@ -251,5 +252,11 @@ void board_flash_init(void)
 
 void board_kinit_init(kinit_t* init_args)
 {
+    return;
+}
+
+void board_oled_init(void)
+{
+    ssd1306_init();
     return;
 }

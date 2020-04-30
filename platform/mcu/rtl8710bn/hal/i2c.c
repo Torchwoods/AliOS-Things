@@ -41,7 +41,7 @@ int32_t hal_i2c_init(i2c_dev_t *i2c)
 
     i2c_resource_t * resource = &g_dev[i2c->port];
 
-#ifdef I2C_MASTER_DEVICE
+#if 1 //I2C_MASTER_DEVICE
     i2c_init(resource->dev, resource->sda_io ,resource->scl_io);
     i2c_frequency(resource->dev,i2c->config.freq);
 

@@ -23,13 +23,13 @@ int32_t hal_i2c_master_send(i2c_dev_t *i2c, uint16_t dev_addr, const uint8_t *da
         i2c_master_stop();
         return -1;
     }
-
+#if 0
     i2c_master_writeByte(0x00);
     if(!i2c_master_checkAck()) {
         i2c_master_stop();
         return -1;
     }
-
+#endif
     for (int i = 0; i < size; ++i)
     {
         i2c_master_writeByte(data[i]);

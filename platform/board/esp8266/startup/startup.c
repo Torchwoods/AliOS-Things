@@ -32,7 +32,7 @@ int user_init(void)
 {
     //board_init();
     //board_wifi_init();
-
+    
     /* main task to run */
     krhino_task_dyn_create(&g_main_task, "main_task", 0, AOS_MAIN_TASK_PRI, 0,
                             AOS_MAIN_TASK_STACK_SIZE, (task_entry_t)aos_maintask, 1);

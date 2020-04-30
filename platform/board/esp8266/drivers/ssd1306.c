@@ -1,0 +1,151 @@
+/*
+ * Copyright (C) 2017 YunOS Project. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#include "aos/kernel.h"
+#include "aos/hal/i2c.h"
+#include "aos/hal/gpio.h"
+#include "board.h"
+#include "ssd1306.h"
+
+#define SSD1306_ADDRS	0x78
+#define SSD1306_WR_CMD	0x00
+#define SSD1306_WR_DATA	0x40
+
+#define BIRGTHNESS	255
+#define SSD1306_WIDTH	128
+#define SSD1306_HIGH	(8*8)
+
+//uint8_t OLED_GRAM[128][8];
+
+static i2c_dev_t oled_i2c_dev = {0};
+
+int32_t ssd1306_write(uint8_t data, SSD1306_WR_MODE mode)
+{
+	uint8_t buf[2] = {0x00,data};
+
+	if(mode == SSD1306_CMD) {
+		buf[0] = SSD1306_WR_CMD;
+	} else if(mode == SSD1306_DATA) {
+		buf[0] = SSD1306_WR_DATA;
+	}
+
+	hal_i2c_master_send(&oled_i2c_dev, SSD1306_ADDRS, buf,2, 1);
+	
+	return 0;
+}
+
+void ssd1306_init(void)
+{
+
+	oled_i2c_dev.port                 = 0;
+    oled_i2c_dev.config.address_width = I2C_HAL_ADDRESS_WIDTH_7BIT;
+    oled_i2c_dev.config.freq          = I2C_BUS_BIT_RATES_100K;
+    oled_i2c_dev.config.mode          = I2C_MODE_MASTER;
+
+ 	hal_i2c_init(&oled_i2c_dev);
+
+	//config oled
+	ssd1306_write(SSD1306_DISPLAYOFF, SSD1306_CMD);
+	ssd1306_write(SSD1306_SETDISPLAYCLOCKDIV, SSD1306_CMD);
+	ssd1306_write(80, SSD1306_CMD);
+	ssd1306_write(SSD1306_SETMULTIPLEX, SSD1306_CMD);
+	ssd1306_write(0x3F, SSD1306_CMD);
+	ssd1306_write(SSD1306_SETSTARTLINE, SSD1306_CMD);
+	ssd1306_write(0xA1, SSD1306_CMD);
+	ssd1306_write(SSD1306_COMSCANINC, SSD1306_CMD);
+	ssd1306_write(SSD1306_SETCOMPINS, SSD1306_CMD);
+	ssd1306_write(0x12, SSD1306_CMD);
+	ssd1306_write(SSD1306_SETCONTRAST, SSD1306_CMD);
+	ssd1306_write(BIRGTHNESS, SSD1306_CMD); //set brightness
+	ssd1306_write(0xd9, SSD1306_CMD);
+	ssd1306_write(0xf1, SSD1306_CMD);
+	ssd1306_write(SSD1306_SETVCOMDETECT, SSD1306_CMD);
+	ssd1306_write(0x30, SSD1306_CMD);
+	
+	ssd1306_write(SSD1306_PAM_PAGE_START, SSD1306_CMD);
+	ssd1306_write(SSD1306_DISPLAYALLON_RESUME, SSD1306_CMD);
+	ssd1306_write(SSD1306_NORMALDISPLAY, SSD1306_CMD);
+
+	ssd1306_write(SSD1306_SETDISPLAYOFFSET, SSD1306_CMD);
+	ssd1306_write(0x00, SSD1306_CMD);
+
+	ssd1306_write(0x00, SSD1306_CMD);
+	ssd1306_write(0x10, SSD1306_CMD);
+
+	ssd1306_write(SSD1306_MEMORYMODE, SSD1306_CMD);
+	ssd1306_write(0x02, SSD1306_CMD);
+	ssd1306_write(0xA1, SSD1306_CMD);
+
+	ssd1306_write(SSD1306_ENABLE_CHARGE_PUMP, SSD1306_CMD);
+	ssd1306_write(0x14, SSD1306_CMD);
+
+	ssd1306_write(SSD1306_DISPLAYON, SSD1306_CMD);
+
+	ssd1306_displayClear();
+	//ssd1306_set_brightness(255);
+	return 0;
+}
+
+#if 0
+void ssd1306_refreshGram(void)
+{
+	uint8_t i = 0,n=0;
+	ssd1306_write(0xA1, SSD1306_CMD);
+	for(i=0;i<8;i++)
+	{
+		ssd1306_write(SSD1306_PAM_PAGE_START+i, SSD1306_CMD);
+		ssd1306_write(0x00, SSD1306_CMD);
+		ssd1306_write(0x10, SSD1306_CMD);
+		for(n=0;n<128;n++)
+		{
+			ssd1306_write(OLED_GRAM[n][i], SSD1306_DATA);
+		}
+	}
+}
+#endif
+
+void ssd1306_displayClear(void)
+{
+	uint8_t i = 0,n=0;
+	ssd1306_write(0xA1, SSD1306_CMD);
+	for(i=0;i<8;i++)
+	{
+		ssd1306_write(SSD1306_PAM_PAGE_START+i, SSD1306_CMD);
+		ssd1306_write(0x00, SSD1306_CMD);
+		ssd1306_write(0x10, SSD1306_CMD);
+		for(n=0;n<128;n++)
+		{
+			//OLED_GRAM[n][i] = 0;
+			ssd1306_write(0x00, SSD1306_DATA);
+		}
+	}
+}
+
+void ssd1306_deinit(void)
+{
+	hal_i2c_finalize(&oled_i2c_dev);
+}
+
+void ssd1306_set_brightness(uint8_t brightness)
+{
+	ssd1306_write(SSD1306_SETCONTRAST, SSD1306_CMD);
+	ssd1306_write(brightness, SSD1306_CMD); //set brightness
+}
+
+void ssd1306_reset(void)
+{
+	
+}

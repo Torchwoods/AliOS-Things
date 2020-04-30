@@ -9,6 +9,7 @@
 #include "board.h"
 #include "hal_spi.h"
 #include "spi_interface.h"
+#include "ssd1306.h"
 
 uart_dev_t uart_0 = { .port = 0,};
 
@@ -31,7 +32,7 @@ SPI_MAPPING SPI_MAPPING_TABLE[PORT_SPI_SIZE] = {
   */
 void board_basic_init(void)
 {
-
+  
 }
 
 /**
@@ -40,7 +41,7 @@ void board_basic_init(void)
   */
 void board_tick_init(void)
 {
-
+	
 }
 
 /**
@@ -67,6 +68,8 @@ void board_dma_init(void)
 void board_gpio_init(void)
 {
     key_gpio_init();
+	//  ssd1306_init();
+    //hal_dht11_init();
 }
 
 /**
@@ -96,5 +99,6 @@ void board_network_init(void)
 
 void board_kinit_init(kinit_t* init_args)
 {
+    
     return;
 }

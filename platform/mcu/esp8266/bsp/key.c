@@ -5,9 +5,9 @@
 #include "aos/kernel.h"
 #include "aos/yloop.h"
 
-#define KEY_GPIO_PIN GPIO_Pin_14
+#define KEY_GPIO_PIN GPIO_Pin_4
 #define KEY_GPIO_MODE GPIO_Mode_Input
-#define KEY_GPIO_PULLUP GPIO_PullUp_DIS
+#define KEY_GPIO_PULLUP GPIO_PullUp_EN
 #define KEY_GPIO_INTRTYPE GPIO_PIN_INTR_NEGEDGE
 
 static uint64_t   elink_time = 0;
@@ -24,7 +24,7 @@ void register_click_callback(click_cb_t cb)
 
 static void key_poll_func(void *arg)
 {
-    uint32_t level = GPIO_INPUT_GET(14);
+    uint32_t level = GPIO_INPUT_GET(4);
     uint64_t diff;
 
     if (level == 0) {
@@ -54,7 +54,7 @@ static void key_proc_work(void *arg)
 
 static void handle_elink_key()
 {
-    uint32_t level = GPIO_INPUT_GET(14);
+    uint32_t level = GPIO_INPUT_GET(4);
 
     if ((level == 0) && (elink_time == 0)) {
         elink_time = aos_now_ms();
@@ -73,8 +73,8 @@ static void key_gpio_isr(void *arg)
     uint32_t gpio_status = GPIO_REG_READ(GPIO_STATUS_ADDRESS);
 
     GPIO_REG_WRITE(GPIO_STATUS_W1TC_ADDRESS, gpio_status);
-
-    if (gpio_status & (1 << 14))
+    printf("gpio_status:%d\n",gpio_status);
+    if (gpio_status & (1 << 4))
         handle_elink_key();
 }
 
@@ -89,6 +89,6 @@ void key_gpio_init(void)
     key_gpio_cnf.GPIO_Pullup = KEY_GPIO_PULLUP;
     key_gpio_cnf.GPIO_IntrType = KEY_GPIO_INTRTYPE;
     gpio_config(&key_gpio_cnf);
-
+    //GPIO_REG_WRITE(GPIO_STATUS_W1TC_ADDRESS, KEY_GPIO_PIN); //Forbidden ouput register
     key_gpio_enable_isr();
 }
