@@ -11,6 +11,12 @@ if AOS_APP_HELLOWORLD_DEMO
         default "helloworld_demo"
 endif
 
+source "application/example/helloiot/Config.in"
+if AOS_APP_HELLOIOT
+    config AOS_BUILD_APP
+        default "helloiot"
+endif
+
 source "application/example/hal_demo/Config.in"
 if AOS_APP_HAL_DEMO
     config AOS_BUILD_APP
