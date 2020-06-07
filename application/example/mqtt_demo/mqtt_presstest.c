@@ -12,15 +12,18 @@
 #include "linkkit/wrappers/wrappers.h"
 #include "linkkit/infra/infra_compat.h"
 
-#define PRODUCT_KEY             "a1MZxOdcBnO"
-#define PRODUCT_SECRET          "h4I4dneEFp7EImTv"
-#define DEVICE_NAME             "test_01"
-#define DEVICE_SECRET           "t9GmMf2jb3LgWfXBaZD2r3aJrfVWBv56"
+#define PRODUCT_KEY             "a1EGAX4deyV"
+#define PRODUCT_SECRET          "ECPSfr0BQ93YFuWG"
+#define DEVICE_NAME             "Alios_Things_device"
+#define DEVICE_SECRET           "mk7UwJZFiqzE8kstXHq8drDKTDbL7vZP"
 
 /* These are pre-defined topics */
-#define TOPIC_UPDATE            "/"PRODUCT_KEY"/"DEVICE_NAME"/update"
-#define TOPIC_ERROR             "/"PRODUCT_KEY"/"DEVICE_NAME"/update/error"
-#define TOPIC_GET               "/"PRODUCT_KEY"/"DEVICE_NAME"/get"
+#define TOPIC_UPDATE            "/"PRODUCT_KEY"/"DEVICE_NAME"/user/update"
+#define TOPIC_ERROR             "/"PRODUCT_KEY"/"DEVICE_NAME"/user/update/error"
+#define TOPIC_GET               "/"PRODUCT_KEY"/"DEVICE_NAME"/user/get"
+
+#define TOPIC_DATA              "/"PRODUCT_KEY"/"DEVICE_NAME"/user/data"
+#define TOPIC_UPLOAD              "/"PRODUCT_KEY"/"DEVICE_NAME"/user/upload"
 
 #define MQTT_MSGLEN             (1024)
 
@@ -110,6 +113,18 @@ static void _demo_message_arrive(void *pcontext, void *pclient, iotx_mqtt_event_
 {
     iotx_mqtt_topic_info_pt     ptopic_info = (iotx_mqtt_topic_info_pt) msg->msg;
 
+    /* print topic name and topic message */
+    EXAMPLE_TRACE("----");
+    EXAMPLE_TRACE("Topic: '%.*s' (Length: %d)",
+                  ptopic_info->topic_len,
+                  ptopic_info->ptopic,
+                  ptopic_info->topic_len);
+    EXAMPLE_TRACE("Payload: '%.*s' (Length: %d)",
+                  ptopic_info->payload_len,
+                  ptopic_info->payload,
+                  ptopic_info->payload_len);
+    EXAMPLE_TRACE("----");
+#if 0
     switch (msg->event_type) {
         case IOTX_MQTT_EVENT_PUBLISH_RECEIVED:
             /* print topic name and topic message */
@@ -149,14 +164,16 @@ static void _demo_message_arrive(void *pcontext, void *pclient, iotx_mqtt_event_
             EXAMPLE_TRACE("Should NOT arrive here.");
             break;
     }
+    #endif 
 }
 
 int mqtt_client(void)
 {
     int rc;
     void *pclient;
+    int cnt = 0;
     iotx_mqtt_param_t mqtt_params;
-    iotx_mqtt_topic_info_t topic_msg;
+    iotx_mqtt_topic_info_t topic_msg,topic_upload;
     char msg_pub[128];
 
     /* Initialize MQTT parameter */
@@ -285,14 +302,42 @@ int mqtt_client(void)
     IOT_MQTT_Yield(pclient, 200);
 
     /* Subscribe the specific topic */
-    rc = IOT_MQTT_Subscribe(pclient, TOPIC_GET, IOTX_MQTT_QOS1, _demo_message_arrive, NULL);
+    rc = IOT_MQTT_Subscribe(pclient, TOPIC_GET, IOTX_MQTT_QOS0, _demo_message_arrive, NULL);
     if (rc < 0) {
         IOT_MQTT_Destroy(&pclient);
         EXAMPLE_TRACE("IOT_MQTT_Subscribe() failed, rc = %d", rc);
         return -1;
     }
+
+    rc = IOT_MQTT_Subscribe(pclient, TOPIC_DATA, IOTX_MQTT_QOS0, _demo_message_arrive, NULL);
+    if (rc < 0) {
+        IOT_MQTT_Destroy(&pclient);
+        EXAMPLE_TRACE("IOT_MQTT_Subscribe() failed, rc = %d", rc);
+        return -1;
+    }
+
+      memset(&topic_upload, 0x0, sizeof(iotx_mqtt_topic_info_t));
+    strcpy(msg_pub, "msg: hello! upload!");
+
+    topic_upload.qos = IOTX_MQTT_QOS1;
+    topic_upload.retain = 0;
+    topic_upload.dup = 0;
+    topic_upload.payload = (void *)msg_pub;
+    topic_upload.payload_len = strlen(msg_pub);
+
     do {
         IOT_MQTT_Yield(pclient, 200);
+
+         if ((cnt % 20) == 0) {
+             rc = IOT_MQTT_Publish(pclient, TOPIC_UPLOAD, &topic_upload);
+            if (rc < 0) {
+                IOT_MQTT_Destroy(&pclient);
+                EXAMPLE_TRACE("error occur when publish");
+                break;
+            }
+        }
+        cnt++;
+
     } while (1);
 
     IOT_MQTT_Unsubscribe(pclient, TOPIC_GET);

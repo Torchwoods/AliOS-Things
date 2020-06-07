@@ -34,6 +34,10 @@ extern uart_dev_t uart_0;
 static uint64_t   awss_time = 0;
 static gpio_dev_t gpio_key_awss;
 
+
+
+gpio_dev_t leds[3];
+
 static void key_poll_func(void *arg)
 {
     uint32_t level;
@@ -232,6 +236,22 @@ void board_stduart_init(void)
     uart_0.config.flow_control = FLOW_CONTROL_DISABLED;
 
     hal_uart_init(&uart_0);
+}
+
+void board_led_init(void)
+{
+	leds[0].port = 6;
+    leds[0].config = OUTPUT_PUSH_PULL;
+
+	leds[1].port = 7;
+    leds[1].config = OUTPUT_PUSH_PULL;
+
+	leds[2].port = 8;
+    leds[2].config = OUTPUT_PUSH_PULL;
+
+	hal_gpio_init(&leds[0]);
+	hal_gpio_init(&leds[1]);
+	hal_gpio_init(&leds[2]);
 }
 
 void board_dma_init(void)
