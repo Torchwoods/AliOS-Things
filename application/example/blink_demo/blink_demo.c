@@ -6,7 +6,8 @@
 #include "ulog/ulog.h"
 #include "board.h"
 #include "aos/hal/gpio.h"
-
+#include "hal_dht11.h"
+#include "oled.h"
 /**
  * Brief:
  * This test code shows how to configure LED gpio.
@@ -20,26 +21,42 @@
 #elif LED4
 #define GPIO_LED_IO         LED4
 #else
-#define GPIO_LED_IO         0xffff
+#define GPIO_LED_IO         1
 #endif
 
 gpio_dev_t led_nucleo;
 
+
+void delays(int x)
+{
+    _asm("nop");
+}
+
 int application_start(int argc, char *argv[])
 {
+    uint8_t value[8] = {0};
+    dht11_sensor_data_t dht;
      /* gpio port config */
     led_nucleo.port = GPIO_LED_IO;
     /* set as output mode */
     led_nucleo.config = OUTPUT_PUSH_PULL;
     /* configure GPIO with the given settings */
-    hal_gpio_init(&led_nucleo);
+    //hal_gpio_init(&led_nucleo);
 
     while (1)
     {
         /* Insert delay 1000 ms */
         aos_msleep(1000);
-        printf(" toggle led \n");
-        hal_gpio_output_toggle(&led_nucleo);
+        //delays(1);
+       // printf(" toggle led \n");
+      //  hal_gpio_output_toggle(&led_nucleo);
+#if 1
+        hal_dht11_read(&dht);
+        sprintf(value,"%0.2f,%0.2f",dht.humidity,dht.temperature);
+        printf("%s\n",value);
+        oled_draw_string_1608(0, 0, value);
+        //oled_draw_string_1608(2, 0, "Hello ESP8266");
+#endif
     }
 
     return 0;

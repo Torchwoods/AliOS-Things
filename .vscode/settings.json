@@ -1,7 +1,20 @@
 {
     "aliosStudio.inner.yosBin": "aos",
-    "aliosStudio.hardware.board": "developerkit",
-    "aliosStudio.name": "helloworld",
+    "aliosStudio.hardware.board": "mk3080",
+    "aliosStudio.name": "linkkit_dht11_demo",
     "aliosStudio.aosVersion": "3.1.0",
-    "C_Cpp.default.browse.databaseFilename": "${workspaceRoot}/.vscode/.TAGS.AOS.DB"
+    "C_Cpp.default.browse.databaseFilename": "${workspaceRoot}/.vscode/.TAGS.AOS.DB",
+    "files.associations": {
+        "functional": "c",
+        "optional": "c",
+        "system_error": "c",
+        "xtr1common": "c",
+        "istream": "c",
+        "ostream": "c",
+        "ratio": "c",
+        "array": "c",
+        "tuple": "c",
+        "type_traits": "c",
+        "utility": "c"
+    }
 }
