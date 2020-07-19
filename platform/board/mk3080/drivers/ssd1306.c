@@ -44,7 +44,6 @@ int32_t ssd1306_write(uint8_t data, SSD1306_WR_MODE mode)
 
 void ssd1306_init(void)
 {
-
 	oled_i2c_dev.port                 = PORT_I2C_2;
     oled_i2c_dev.config.address_width = I2C_HAL_ADDRESS_WIDTH_7BIT;
     oled_i2c_dev.config.freq          = I2C_BUS_BIT_RATES_100K;

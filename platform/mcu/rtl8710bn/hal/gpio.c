@@ -68,6 +68,13 @@ int32_t hal_gpio_init( gpio_dev_t *gpio )
 	gpio_t *gpio_obj = &(((gpio_objs_t *)(gpio->priv))->gpio_obj);
 	uint8_t pin = gpio_remap[gpio->port];
 
+	if(pin == PA_14 || pin == PA_15)
+	{
+		PINMUX_SWD_OFF();//关闭SWD
+		Pinmux_Config(PA_14, PINMUX_FUNCTION_GPIO);
+		Pinmux_Config(PA_15, PINMUX_FUNCTION_GPIO);
+	}
+	
   	gpio_init(gpio_obj, pin);
 
   	switch(gpio->config){

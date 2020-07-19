@@ -41,6 +41,31 @@ if AOS_APP_LINKKIT_SERIAL_DEMO
         default "linkkit_serial_demo"
 endif
 
+source "application/example/linkkit_light_demo/Config.in"
+if AOS_APP_LINKKIT_LIGHT_DEMO
+    config AOS_BUILD_APP
+        default "linkkit_light_demo"
+endif
+
+source "application/example/linkkit_relay_demo/Config.in"
+if AOS_APP_LINKKIT_RELAY_DEMO
+    config AOS_BUILD_APP
+        default "linkkit_relay_demo"
+endif
+
+source "application/example/linkkit_maglock_demo/Config.in"
+if AOS_APP_LINKKIT_MAGLOCK_DEMO
+    config AOS_BUILD_APP
+        default "linkkit_maglock_demo"
+endif
+
+
+source "application/example/linkkit_dht11_demo/Config.in"
+if AOS_APP_LINKKIT_DHT11_DEMO
+    config AOS_BUILD_APP
+        default "linkkit_dht11_demo"
+endif
+
 source "application/example/coap_demo/Config.in"
 if AOS_APP_COAP_DEMO
     config AOS_BUILD_APP
@@ -57,6 +82,12 @@ source "application/example/blink_demo/Config.in"
 if AOS_APP_BLINK_DEMO
     config AOS_BUILD_APP
         default "blink_demo"
+endif
+
+source "application/example/blink_gpio_demo/Config.in"
+if AOS_APP_BLINK_GPIO_DEMO
+    config AOS_BUILD_APP
+        default "blink_gpio_demo"
 endif
 
 source "application/example/yloop_demo/Config.in"

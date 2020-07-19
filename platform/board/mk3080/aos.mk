@@ -19,7 +19,8 @@ $(NAME)_COMPONENTS += $(HOST_MCU_FAMILY) kernel_init network
 GLOBAL_LDFLAGS += -T $(SOURCE_ROOT)/platform/board/mk3080/ld/rlx8711B-symbol-v02-img2_xip1.ld
 $(NAME)_SOURCES := startup/board.c \
                     drivers/oled.c \
-                    drivers/ssd1306.c 
+                    drivers/ssd1306.c \
+                    drivers/hal_dht11.c
 
 $(NAME)_SOURCES += config/k_config.c \
                     startup/startup.c

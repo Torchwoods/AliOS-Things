@@ -68,7 +68,7 @@ void board_dma_init(void)
 void board_gpio_init(void)
 {
     key_gpio_init();
-	//  ssd1306_init();
+	  ssd1306_init();
     //hal_dht11_init();
 }
 

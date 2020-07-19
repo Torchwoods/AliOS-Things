@@ -37,6 +37,8 @@ static gpio_dev_t gpio_key_awss;
 
 
 gpio_dev_t leds[3];
+gpio_dev_t relay;
+gpio_dev_t maglock;
 
 static void key_poll_func(void *arg)
 {
@@ -252,6 +254,20 @@ void board_led_init(void)
 	hal_gpio_init(&leds[0]);
 	hal_gpio_init(&leds[1]);
 	hal_gpio_init(&leds[2]);
+}
+
+void board_relay_init(void)
+{
+    relay.port = 1;
+    relay.config = OUTPUT_OPEN_DRAIN_NO_PULL;
+	hal_gpio_init(&relay);
+}
+
+void board_maglock_init(void)
+{
+    maglock.port = 0;
+    maglock.config = OUTPUT_OPEN_DRAIN_NO_PULL;
+	hal_gpio_init(&maglock);
 }
 
 void board_dma_init(void)
