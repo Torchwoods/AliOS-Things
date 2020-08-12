@@ -87,7 +87,7 @@ void key_gpio_init(void)
     key_gpio_cnf.GPIO_Pin = KEY_GPIO_PIN;
     key_gpio_cnf.GPIO_Mode = KEY_GPIO_MODE;
     key_gpio_cnf.GPIO_Pullup = KEY_GPIO_PULLUP;
-    key_gpio_cnf.GPIO_IntrType = KEY_GPIO_INTRTYPE;
+    key_gpio_cnf.GPIO_IntrType = KEY_GPIO_INTRTYPE; 
     gpio_config(&key_gpio_cnf);
     //GPIO_REG_WRITE(GPIO_STATUS_W1TC_ADDRESS, KEY_GPIO_PIN); //Forbidden ouput register
     key_gpio_enable_isr();

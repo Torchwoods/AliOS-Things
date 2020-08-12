@@ -21,8 +21,11 @@ extern void board_tick_init(void);
 extern void board_stduart_init(void);
 extern void board_dma_init(void);
 extern void board_gpio_init(void);
+extern void board_network_init(void);
 extern void board_kinit_init(kinit_t* init_args);
-
+extern void board_flash_init(void);
+extern void board_led_init(void);
+extern void board_relay_init(void);
 /*  For user config
     kinit.argc = 0;
     kinit.argv = NULL;
@@ -40,7 +43,12 @@ void board_init(void)
     board_tick_init();
     board_stduart_init();
     board_dma_init();
-    //board_gpio_init();
+    board_gpio_init();
+    board_flash_init();
+    board_relay_init();
+    
+    board_network_init();
+    /*FOR STM32F429 delete hal_i2c_pre_init \I2C1_init\CAN_init here*/
 }
 
 void aos_maintask(void* arg)
@@ -53,3 +61,4 @@ void aos_maintask(void* arg)
     application_start(kinit.argc, kinit.argv);  /* jump to app entry */
 #endif
 }
+

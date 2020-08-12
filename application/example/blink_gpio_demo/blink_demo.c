@@ -7,14 +7,20 @@
 #include "board.h"
 #include "aos/hal/gpio.h"
 
-#define GPIO_KEY_IO 12
-#define GPIO_LED_IO 6
+#if defined ESP8266_CHIPSET
+    #define GPIO_KEY_IO 4
+    #define GPIO_LED_IO 16
+#else
+   #define GPIO_KEY_IO 12
+   #define GPIO_LED_IO 6
+#endif
 
 gpio_dev_t led;
 gpio_dev_t key;
 
 void key_handler(void *arg)
 {
+    hal_gpio_clear_irq(&key);
     hal_gpio_output_toggle(&led);
 }
 
@@ -31,10 +37,10 @@ int application_start(int argc, char *argv[])
     }
 
     key.port = GPIO_KEY_IO;
-    key.config = INPUT_PULL_UP;
+    key.config = IRQ_MODE;
 
     hal_gpio_init(&key);
-    hal_gpio_enable_irq(&key, IRQ_TRIGGER_FALLING_EDGE, key_handler, NULL);
+    hal_gpio_enable_irq(&key, IRQ_TRIGGER_FALLING_EDGE, key_handler, (void *)GPIO_KEY_IO);
 
     while(1)
     aos_msleep(100);

@@ -28,8 +28,8 @@
 // for demo only
 #define PRODUCT_KEY      "a1FMZafZCjE"
 #define PRODUCT_SECRET   "e4E5gyNhUiisZYja"
-#define DEVICE_NAME      "8oUR83ok2rKuqij6pqjL"
-#define DEVICE_SECRET    "nbdMrYgyp3kkzWJ074ajjlxSU5JYisfM"
+#define DEVICE_NAME      "4LPFcYxVXvN497pmnzRe"
+#define DEVICE_SECRET    "7f63368d7be3fe792b9fc54e351619c8"
 
 #define EXAMPLE_TRACE(...)                                          \
     do {                                                            \

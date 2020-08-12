@@ -14,6 +14,9 @@
 #include "linkkit/infra/infra_config.h"
 #include "linkkit/wrappers/wrappers.h"
 
+#include "espressif/esp_common.h"
+#include "gpio.h"
+
 #include "aos/hal/gpio.h"
 #ifdef INFRA_MEM_STATS
     #include "linkkit/infra/infra_mem_stats.h"
@@ -25,14 +28,11 @@
 #endif
 #include "app_entry.h"
 
-#include "hal_dht11.h"
-#include "oled.h"
-
 // for demo only
-#define PRODUCT_KEY      "a1NQunLi7Pd"
-#define PRODUCT_SECRET   "LEtf0NoEjqNsJNMV"
-#define DEVICE_NAME      "1CwlHpBT8p0kVx4mSp6D"
-#define DEVICE_SECRET    "FlnURCeNTHVmJDeCqqBe8g77bhvXmsC0"
+#define PRODUCT_KEY      "a1POcwVUWHL"
+#define PRODUCT_SECRET   "3stVz6LLVUuKBbaf"
+#define DEVICE_NAME      "DeIqA7lO2NnjTuMuHsTC"
+#define DEVICE_SECRET    "j3W8UM5zzBYEf6vByE9bAouz7JZeFCn1"
 
   
 #define EXAMPLE_TRACE(...)                                          \
@@ -59,12 +59,11 @@ typedef struct {
  */
 
 static user_example_ctx_t g_user_example_ctx;
-static char g_maglock_state = 0;
-static  dht11_sensor_data_t dht;
+static uint8_t doorStatus = 0;
+static uint8_t preDoorStatus = 0;
 
-extern gpio_dev_t maglock;
-int hal_maglock_off(void);
-int hal_maglock_on(void);
+extern gpio_dev_t relay;
+
 /** cloud connected event callback */
 static int user_connected_event_handler(void)
 {
@@ -120,13 +119,27 @@ static int user_property_set_event_handler(const int devid, const char *request,
 {
     int res = 0;
     cJSON *rJson = NULL,*sw= NULL;
-    int maglockState = 0;
+    //int relayState = 0;
     EXAMPLE_TRACE("Property Set Received, Request: %s", request);
     //解析JSON数据
     rJson = cJSON_Parse(request);
     if(!rJson)
         return -1;
 
+#if 0    
+    sw = cJSON_GetObjectItem(rJson,"PowerSwitch_1");
+	if(sw)
+	{
+		relayState = sw->valueint;
+		EXAMPLE_TRACE("relayState=%d", relayState);
+		if(relayState)
+            hal_relay_on();
+        else
+            hal_relay_off();
+	}
+
+    hal_relay_state_post_property();
+ #endif   
     EXAMPLE_TRACE("Post Property Message ID: %d", res);
     cJSON_Delete(rJson);
     return 0;
@@ -228,16 +241,20 @@ static int user_cota_event_handler(int type, const char *config_id, int config_s
 }
 
 
-void hal_dht11_state_post_property(void)
+void hal_doorsensor_state_post_property(void)
 {
     int res = 0;
-
+  
     char property_payload[30] = {0};
-    HAL_Snprintf(property_payload, sizeof(property_payload), "{\"mhumi\": %d,\"mtemp\": %d}",
-                    (int)dht.humidity,(int)dht.temperature);
+
+    doorStatus = GPIO_INPUT_GET(4);
+
+    HAL_Snprintf(property_payload, sizeof(property_payload), "{\"doorStatus\": %d}", doorStatus);
 
     res = IOT_Linkkit_Report(EXAMPLE_MASTER_DEVID, ITM_MSG_POST_PROPERTY,
                              (unsigned char *)property_payload, strlen(property_payload));
+
+    preDoorStatus = doorStatus;
 
     EXAMPLE_TRACE("Post Property Message ID: %d", res);
 }
@@ -297,14 +314,42 @@ void set_iotx_info()
     }
 }
 
+
+static uint8_t cnt = 0;
+static uint8_t delay_start = 0;
+static uint8_t active = 0;
+
+static void key_delay_func(void *arg)
+{
+    delay_start = 0;
+    cnt = 0;
+}
+
+//按键功能处理
+int linkkit_doorsensor_handle(void)
+{
+    if(!delay_start)
+    {
+        delay_start = 1;
+        cnt = 0;
+        aos_post_delayed_action(5000, key_delay_func, NULL);
+    }
+
+    cnt++;
+    if(cnt > 4)
+        do_awss_reset();
+    else    
+        hal_doorsensor_state_post_property();
+
+    active = 1;
+    return 0;
+}
+
 int linkkit_main(void *paras)
 {
     int res = 0;
     int cnt = 0;
     int auto_quit = 0;
-
-    uint8_t ssd1306_value[16] = {0};
-
     iotx_linkkit_dev_meta_info_t master_meta_info;
     int domain_type = 0, dynamic_register = 0, post_reply_need = 0, fota_timeout = 30;
     int   argc = 0;
@@ -391,27 +436,16 @@ int linkkit_main(void *paras)
         HAL_SleepMs(5000);
     } while (1);
 
-    cnt = 0;
-    
     while (1) {
         IOT_Linkkit_Yield(EXAMPLE_YIELD_TIMEOUT_MS);
-        
-        /* Get DHT11 data 10s */
+        //10s
         if ((cnt % 50) == 0) {
-            hal_dht11_read(&dht);
-            //显示湿度
-            memset(ssd1306_value,0,sizeof(ssd1306_value));
-            sprintf(ssd1306_value,"HUM:%0.2f",dht.humidity);
-            oled_draw_string_1608(0, 0, ssd1306_value);
-            //显示温度
-            memset(ssd1306_value,0,sizeof(ssd1306_value));
-            sprintf(ssd1306_value,"TMP:%0.2f",dht.temperature);
-            oled_draw_string_1608(0, 2, ssd1306_value);
-
-            //属性上报
-            hal_dht11_state_post_property();
+            if(preDoorStatus != GPIO_INPUT_GET(4))
+            {
+                hal_doorsensor_state_post_property();
+            }
+            cnt = 0;
         }
-        
         cnt++;
     }
 

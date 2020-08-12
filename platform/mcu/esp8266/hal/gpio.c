@@ -216,6 +216,7 @@ int32_t hal_gpio_enable_irq(aos_gpio_dev_t *gpio, gpio_irq_trigger_t trigger,
     {
         return EIO;
     }
+    
     GPIO_ConfigTypeDef gpio_in_cfg;                     //Define GPIO Init Structure
     gpio_in_cfg.GPIO_IntrType = (GPIO_INT_TYPE)trigger; //set the type
     gpio_in_cfg.GPIO_Mode = GPIO_Mode_Input;            //Input mode

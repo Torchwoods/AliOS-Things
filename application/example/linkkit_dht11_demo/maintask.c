@@ -46,7 +46,6 @@ void board_init(void)
     board_dma_init();
     board_gpio_init();
     board_flash_init();
-    board_maglock_init();
     
     board_network_init();
     /*FOR STM32F429 delete hal_i2c_pre_init \I2C1_init\CAN_init here*/

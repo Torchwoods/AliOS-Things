@@ -10,8 +10,11 @@
 #include "hal_spi.h"
 #include "spi_interface.h"
 #include "ssd1306.h"
+#include "aos/hal/gpio.h"
 
 uart_dev_t uart_0 = { .port = 0,};
+gpio_dev_t leds[3];
+gpio_dev_t relay;
 
 extern hal_wifi_module_t aos_wifi_esp8266;
 extern char _bss_start;
@@ -60,6 +63,14 @@ void board_dma_init(void)
 
 }
 
+
+void board_relay_init(void)
+{
+  relay.port = 13;
+  relay.config = OUTPUT_OPEN_DRAIN_NO_PULL;
+  hal_gpio_init(&relay);
+}
+
 /**
   * @brief GPIO Initialization Function
   * @param None
@@ -70,6 +81,15 @@ void board_gpio_init(void)
     key_gpio_init();
 	  ssd1306_init();
     //hal_dht11_init();
+}
+
+
+void board_led_init(void)
+{
+  leds[0].port = 16;
+  leds[0].config= OUTPUT_PUSH_PULL;
+
+  hal_gpio_init(&leds[0]);
 }
 
 /**

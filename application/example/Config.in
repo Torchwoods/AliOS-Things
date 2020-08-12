@@ -41,6 +41,12 @@ if AOS_APP_LINKKIT_SERIAL_DEMO
         default "linkkit_serial_demo"
 endif
 
+source "application/example/linkkit_doorsensor_demo/Config.in"
+if AOS_APP_LINKKIT_DOORSENSOR_DEMO
+    config AOS_BUILD_APP
+        default "linkkit_doorsensor_demo"
+endif
+
 source "application/example/linkkit_light_demo/Config.in"
 if AOS_APP_LINKKIT_LIGHT_DEMO
     config AOS_BUILD_APP
