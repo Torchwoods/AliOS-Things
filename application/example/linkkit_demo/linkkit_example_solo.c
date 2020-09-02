@@ -13,7 +13,7 @@
 #include "linkkit/dev_model_api.h"
 #include "linkkit/infra/infra_config.h"
 #include "linkkit/wrappers/wrappers.h"
-
+ 
 #ifdef INFRA_MEM_STATS
     #include "linkkit/infra/infra_mem_stats.h"
 #endif
@@ -308,6 +308,7 @@ int linkkit_main(void *paras)
         auto_quit = 1;
         cnt = 0;
     }
+    
     memset(&g_user_example_ctx, 0, sizeof(user_example_ctx_t));
 
     memset(&master_meta_info, 0, sizeof(iotx_linkkit_dev_meta_info_t));

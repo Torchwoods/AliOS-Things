@@ -62,7 +62,7 @@ static void handle_elink_key()
        // aos_loop_schedule_work(0, key_proc_work, NULL, NULL, NULL);
     }
 }
-
+ 
 static void key_gpio_enable_isr(void)
 {
     _xt_isr_unmask(1 << ETS_GPIO_INUM);

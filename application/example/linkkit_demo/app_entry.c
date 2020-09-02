@@ -494,7 +494,7 @@ int application_start(int argc, char **argv)
     sal_add_dev(NULL, &data);
     sal_init();
 #endif
-
+ 
     aos_set_log_level(AOS_LL_DEBUG);
     set_iotx_info();
     netmgr_init();

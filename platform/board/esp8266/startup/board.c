@@ -15,6 +15,8 @@
 uart_dev_t uart_0 = { .port = 0,};
 gpio_dev_t leds[3];
 gpio_dev_t relay;
+gpio_dev_t buzzer;
+gpio_dev_t lightsensor;
 
 extern hal_wifi_module_t aos_wifi_esp8266;
 extern char _bss_start;
@@ -61,6 +63,20 @@ void board_stduart_init(void)
 void board_dma_init(void)
 {
 
+}
+
+void board_lightsensor_init(void)
+{
+  lightsensor.port = 12;
+  lightsensor.config = INPUT_PULL_UP;
+  hal_gpio_init(&lightsensor);
+}
+
+void board_buzzer_init(void)
+{
+  buzzer.port = 5;
+  buzzer.config = OUTPUT_OPEN_DRAIN_NO_PULL;
+  hal_gpio_init(&buzzer);
 }
 
 

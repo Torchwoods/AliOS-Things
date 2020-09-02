@@ -72,6 +72,18 @@ if AOS_APP_LINKKIT_DHT11_DEMO
         default "linkkit_dht11_demo"
 endif
 
+source "application/example/linkkit_alarm_demo/Config.in"
+if AOS_APP_LINKKIT_ALARM_DEMO
+    config AOS_BUILD_APP
+        default "linkkit_alarm_demo"
+endif
+
+source "application/example/linkkit_lightsensor_demo/Config.in"
+if AOS_APP_LINKKIT_LIGHTSENSOR_DEMO
+    config AOS_BUILD_APP
+        default "linkkit_lightsensor_demo"
+endif
+
 source "application/example/coap_demo/Config.in"
 if AOS_APP_COAP_DEMO
     config AOS_BUILD_APP
